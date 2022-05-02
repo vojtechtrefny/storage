@@ -1282,11 +1282,18 @@ class BlivetLVMPool(BlivetPool):
         if not self._device:
             return
 
+        global safe_mode
+
         add_disks = [d for d in self._disks if d not in self._device.ancestors]
         remove_disks = [pv for pv in self._device.pvs if not any(d in pv.ancestors for d in self._disks)]
 
         if not (add_disks or remove_disks):
             return
+
+        if remove_disks and safe_mode:
+            raise BlivetAnsibleError("cannot remove members '%s' from pool '%s' in safe mode" %
+                                     (", ".join(d.name for d in remove_disks),
+                                      self._device.name))
 
         if self._is_raid:
             raise BlivetAnsibleError("managing pool members is not supported with RAID")
