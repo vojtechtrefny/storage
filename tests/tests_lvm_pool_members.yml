@@ -5,6 +5,7 @@
     storage_safe_mode: false
     storage_use_partitions: true
     volume_group_size: '10g'
+    volume_size: '1g'
   tags:
     - tests::lvm
 
@@ -31,6 +32,9 @@
         storage_pools:
           - name: foo
             disks: "{{ unused_disks }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -45,6 +49,9 @@
         storage_pools:
           - name: foo
             disks: "{{ unused_disks }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -63,6 +70,9 @@
         storage_pools:
           - name: foo
             disks: "{{ [unused_disks[0]] }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -81,6 +91,9 @@
         storage_pools:
           - name: foo
             disks: "{{ [unused_disks[0], unused_disks[1]] }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -99,6 +112,9 @@
         storage_pools:
           - name: foo
             disks: "{{ [unused_disks[1], unused_disks[2]] }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -120,6 +136,9 @@
             encryption: true
             encryption_password: 'yabbadabbadoo'
             disks: "{{ unused_disks }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - name: Save UUID of the created volume group
       command: "vgs --noheading -o vg_uuid foo"
@@ -134,6 +153,9 @@
             encryption: true
             encryption_password: 'yabbadabbadoo'
             disks: "{{ [unused_disks[0]] }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
@@ -154,6 +176,9 @@
             encryption: true
             encryption_password: 'yabbadabbadoo'
             disks: "{{ unused_disks }}"
+            volumes:
+              - name: test
+                size: "{{ volume_size }}"
 
     - include_tasks: verify-role-results.yml
 
