@@ -219,12 +219,21 @@ class BlivetBase(object):
             else:
                 fmt = get_format(None)
 
+            luks_version = self._spec_dict.get('encryption_luks_version')
+
+            if luks_version != "luks1" and hasattr(device, "logical_block_size") and \
+               device.logical_block_size != device.physical_block_size:
+                luks_sector_size = device.logical_block_size
+            else:
+                luks_sector_size = 0
+
             self._blivet.format_device(device,
                                        get_format("luks",
                                                   name=luks_name,
                                                   cipher=self._spec_dict.get('encryption_cipher'),
                                                   key_size=self._spec_dict.get('encryption_key_size'),
-                                                  luks_version=self._spec_dict.get('encryption_luks_version'),
+                                                  luks_version=luks_version,
+                                                  luks_sector_size=luks_sector_size,
                                                   passphrase=self._spec_dict.get('encryption_password') or None,
                                                   key_file=self._spec_dict.get('encryption_key') or None))
 
