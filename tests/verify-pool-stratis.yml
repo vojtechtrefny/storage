@@ -1,0 +1,33 @@
+---
+# Only when pool is stratis
+- name: Check Stratis options
+  when: storage_test_pool.type == 'stratis'
+  block:
+    - name: Get information about RAID
+      command: stratis report
+      register: storage_test_stratis
+      changed_when: false
+
+    - name: Get information about the stratis pool
+      set_fact:
+        _stratis_pool_info: "{{ storage_test_stratis.stdout | from_json | community.general.json_query('pools[?name==`foo`]') }}"
+
+    - name: Debug
+      ansible.builtin.debug:
+        msg: "{{ _stratis_pool_info }}"
+
+    - name: Verify that the pools was created
+      assert:
+        that: _stratis_pool_info | length == 1
+        msg: >-
+          Stratis pool '{{ storage_test_pool.name }}' not found
+      when: storage_test_pool.state == 'present'
+
+    - name: Verify that encryption is correctly set
+      assert:
+        that: storage_test_pool.name in _stratis_pool_info[0]['blockdevs']['datadevs'][0]['key_description']
+        msg: >-
+          Stratis pool '{{ storage_test_pool.name }}' is not encrypted
+      when:
+        - storage_test_pool.state == 'present'
+        - storage_test_pool.encryption
